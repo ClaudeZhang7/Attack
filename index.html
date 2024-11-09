@@ -80,12 +80,14 @@
 
     };
 
+    let shouldWarnUser = true; 
+
     window.addEventListener('beforeunload', function (event) {
-    const shouldWarnUser = true; 
 
     if (shouldWarnUser) {
         event.preventDefault();
         event.returnValue = ''; 
+        shouldWarnUser = false;
     }
 });
 
